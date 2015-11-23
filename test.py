@@ -1,49 +1,128 @@
-def expand(maxSeqs):
-    result = []
-    for each in maxSeqs:
-        tmp = []
-        count = 0
-        for one in each:
-            count += 1
-        time1 = 0
-        
-        if count == 2:   
-            while time1 <= 1:
-            	time2 = 0
-                while time2 <= 4:
-                    tmp.append(each[time1])
-                    time2 += 1
-                time1 += 1
-        if count == 3:
-            while time1 <= 2:
-            	time2 = 0
-                while time2 <= 2:
-                    tmp.append(each[time1])
-                    time2 += 1
-                time1 += 1
-        if count == 4:
-            while time1 <= 3:
-            	time2 = 0
-                while time2 <= 1:
-                    tmp.append(each[time1])
-                    time2 += 1
-                time1 += 1
-        if count == 5:
-            while time1 <= 4:
-            	time2 = 0
-                while time2 <= 1:
-                    tmp.append(each[time1])
-                    time2 += 1
-                time1 += 1
-        if count >= 6:
-            tmp += each
+#coding=utf-8
+__author__ = 'Prince'
 
-    	if tmp != []:
-        	result += [tmp]
-    return result
+from dataPrepare import *
+from util import *
+import numpy as np
+
+# def getAllIndex(s,element):
+#     indices = []
+#     count = 0
+#     for each in s:
+#         if each == element:
+#             indices += [count]
+#         count += 1
+#     return indices
+
+# def generateCombination(currentCombination, currentPattern, places):
+#     resultSet = []
+#     pattern = currentPattern[:]
+#     # print 'currentPattern:',currentPattern,' Type:',type(currentPattern)
+#     if currentPattern == []:
+#     	# print currentCombination
+#         return [currentCombination]
+#     else:
+#         nextPlace = pattern.pop(0)
+#         for eachCertainPlace in places[nextPlace[0]]:
+#             lenthPlueOneCombination = currentCombination[:]
+#             lenthPlueOneCombination.append([eachCertainPlace['name']])
+#             generated = generateCombination(lenthPlueOneCombination, pattern, places)
+#             resultSet.extend(generated)
+#         return resultSet
+
+# def generateCombinationWithTime(currentCombination, currentPattern, places):
+#     resultSet = []
+#     pattern = currentPattern[:]
+#     # print 'currentPattern:',currentPattern,' Type:',type(currentPattern)
+#     if currentPattern == []:
+#     	# print currentCombination
+#         return [currentCombination]
+#     else:
+#         nextPlace = pattern.pop(0)
+#         # print places
+#         for eachCertainPlace in places[nextPlace[0]]:
+#             lenthPlueOneCombination = currentCombination[:]
+#             # if lenthPlueOneCombination == []:
+#             # print lenthPlueOneCombination[-1]
+#             if lenthPlueOneCombination == [] or lenthPlueOneCombination[-1]['time'] < eachCertainPlace['time']:
+#             	lenthPlueOneCombination.append(eachCertainPlace)
+#             	generated = generateCombinationWithTime(lenthPlueOneCombination, pattern, places)
+#             else:
+#                 generated = None
+#             if generated is not None:
+#                 resultSet.extend(generated)
+#         if resultSet == []:
+#         	return None
+#         else:
+#         	return resultSet
+
+# def compactInfo(record):
+# 	info = []
+# 	for each in record['data']:
+# 		compactInfo = {'place':each['place']['name'], 'time':each['time']}
+# 		info.append(compactInfo)
+# 	return info
+
+# def isInSeqWithTime(nseq,tseq,deltaT):
+# 	allPossibleSeq = []
+# 	record = compactInfo(tseq)
+# 	places = {}
+# 	for eachItem in nseq:
+# 		places.setdefault(eachItem[0], [])
+# 		for each in record:
+# 			if each['place'] == eachItem[0]:
+# 				places[eachItem[0]].append(each)
+# 	allPossibleSeq = generateCombinationWithTime([], nseq, places)
+
+# 	print allPossibleSeq
+
+# 	maxTimeGaps = []
+
+# 	for eachCandidate in allPossibleSeq:
+# 		maxTimeGap = 0
+# 		count = 0
+# 		for each in eachCandidate:
+# 			count += 1
+# 		timeGaps = []
+# 		for i in range(0, count-1):
+# 			timeGaps += [eachCandidate[i+1]['time'] - eachCandidate[i]['time']]
+# 		maxTimeGap = max(timeGaps)
+
+# 		maxTimeGaps += [maxTimeGap]
+
+# 	minMaxTimeGap = min(maxTimeGaps)
+
+# 	if minMaxTimeGap < deltaT:
+# 			return True
+# 	else:
+# 			return False
+
+def converToPoint(snippet):
+	matrix = []
+	for eachPlace in snippet['objects'][0]['data']:
+		coordinates = [int(eachPlace['place']['loc']['x']),int(eachPlace['place']['loc']['y'])]
+		matrix.append(coordinates)
+	return np.array(matrix)
+
+def distance(point1, point2):
+	tmp = point1 - point2
+	distance = np.linalg.norm(tmp,ord=None)
+	return distance
 
 
-test = [[[1]],[[1],[2]],[[1],[2],[3]],[[1],[2],[3],[4]],[[1],[2],[3],[4],[5]],[[1],[2],[3],[4],[5],[6]],[[1],[2],[3],[4],[5],[6],[7]],[[1],[2],[3],[4],[5],[6],[7],[8]],[[1],[2],[3],[4],[5],[6],[7],[8],[9]],[[1],[2],[3],[4],[5],[6],[7],[8],[9],[0]]]
+if __name__ == "__main__":
 
-ans = expand(test)
-print ans
+    gammaS = [{'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}]
+    eachSi = {'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}
+    print gammaS
+    print eachSi
+
+    gammaS.remove(eachSi)
+    print gammaS
+
+
+
+
+
+
+
