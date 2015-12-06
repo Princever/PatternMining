@@ -2,8 +2,9 @@
 __author__ = 'Prince'
 
 from dataPrepare import *
-from util import *
+# from util import *
 import numpy as np
+import pylab as pl
 
 # def getAllIndex(s,element):
 #     indices = []
@@ -114,11 +115,27 @@ if __name__ == "__main__":
 
     gammaS = [{'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}]
     eachSi = {'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}
-    print gammaS
-    print eachSi
+    # print gammaS
+    # print eachSi
 
-    gammaS.remove(eachSi)
-    print gammaS
+    # gammaS.remove(eachSi)
+    # print gammaS
+
+    amat = [[1, 14],[12, 12],[14, 30]]
+
+    mat = np.array(amat)
+
+    l = [x[0] for x in mat]
+
+    color = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+
+    pl.plot([x[0] for x in mat], [x[1] for x in mat], color[3])# use pylab to plot x and y
+    pl.plot([x[0] for x in mat], [x[1] for x in mat], color[3]+'o')    
+    pl.show()
+
+    print l
+
+    print 7%7
 
 
 

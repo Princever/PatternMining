@@ -44,10 +44,11 @@ def findInS(newCenter, gammaS):
 def weightedSnippetShift(snippets, bandwidth, dampeningfactor):
 	# epsilon = 0
 	gammaS = []
+	# print snippets
 	for eachSnippet in snippets:
 		center = []
 		k = 0
-		# print eachSnippet
+		# print 'asnip',eachSnippet
 		center.append(eachSnippet['mat'])
 		while True:
 			pointSet = findPointsInRange(snippets, center[k], bandwidth, dampeningfactor)
@@ -72,12 +73,12 @@ def supOf(cluster):
 def varOf(cluster):
 	sumX2 = 0
 	sumX = 0
-	count += 0
+	count = 0
 	for eachSnippet in cluster['points']:
 		sumX += eachSnippet['mat']
 		sumX2 += np.dot(eachSnippet['mat'].T, eachSnippet['mat'])
 		count += 1
-	var = sumX2/float(count) - np.dot(sumX/float(count).T, sumX/float(count))
+	var = sumX2/float(count) - np.dot((sumX/float(count)).T, sumX/float(count))
 
 # def	gammaCommunities(gammaS, gamma):
 
@@ -86,17 +87,20 @@ def splitPattern(snippets, supthreshold, varthreshold, bandwidth, dampeningfacto
 	fineGrainedPatterns = []
 	gammaS = weightedSnippetShift(snippets, bandwidth, dampeningfactor)
 	for eachSi in gammaS:
-		# if supOf(eachSi) >= supthreshold and varOf(eachSi) <= varthreshold:
-		if True:
+		if supOf(eachSi) >= supthreshold and varOf(eachSi) <= varthreshold:
+		# if True:
 			fineGrainedPatterns.append(eachSi)
-			gammaS.remove(eachSi)          
+			gammaS.remove(eachSi)         
 
 	# gamma = math.sqrt(2) * dampeningfactor * bandwidth
 	gammaC = copy.deepcopy(gammaS)
 
+	# for eachii in gammaC:
+	# 	print eachii
+
 	for eachCi in gammaC:
 		if supOf(eachSi) >= supthreshold:
-			result = splitPattern(eachCi, supthreshold, varthreshold, dampeningfactor * bandwidth, dampeningfactor)
+			result = splitPattern(eachCi['points'], supthreshold, varthreshold, dampeningfactor * bandwidth, dampeningfactor)
 			if result != []:
 				fineGrainedPatterns.append(result)
 

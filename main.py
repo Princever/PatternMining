@@ -15,8 +15,8 @@ if __name__ == "__main__":
     # 	print each
     deltaT = 180
     min_supp = 0.03#0.03 perfect, 0.01 for more potential, 0.05 is consist but not serious
-    varthreshold = 0.0002
-    bandwidth = 0.02
+    varthreshold = 2
+    bandwidth = 20
     dampeningfactor = 0.5
 
     count = 0
@@ -51,7 +51,10 @@ if __name__ == "__main__":
         tmpResult = splitPattern(eachPattern['snippets'], min_supp * count, varthreshold, bandwidth, dampeningfactor)
         if tmpResult != []:
         	fineGrainedPatterns.append(tmpResult)
-    print fineGrainedPatterns
+    for eachPattern in fineGrainedPatterns:
+        print 'A Pattern:',eachPattern
+
+    drawPatterns(fineGrainedPatterns)
 
 
 

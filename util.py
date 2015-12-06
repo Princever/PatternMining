@@ -190,6 +190,22 @@ def genPlotDatas(maxSeqs):
 
     return stages
 
+def drawPatterns(fineGrainedPatterns):
+    
+    color = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    index = 0
+    count = 1
+    for eachPattern in fineGrainedPatterns:
+        pl.figure(count)
+        pl.grid(True)
+        for eachSnippet in eachPattern[0]['points']:
+            pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index])# use pylab to plot x and y
+            pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index] + 'o')
+        count += 1
+        index += 1
+        index = index%7  
+    pl.show()
+
 def figureStage(index, stages):
     stagex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     pl.figure(index)
