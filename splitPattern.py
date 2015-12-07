@@ -102,6 +102,7 @@ def splitPattern(snippets, supthreshold, varthreshold, bandwidth, dampeningfacto
 		if supOf(eachSi) >= supthreshold:
 			result = splitPattern(eachCi['points'], supthreshold, varthreshold, dampeningfactor * bandwidth, dampeningfactor)
 			if result != []:
-				fineGrainedPatterns.append(result)
+				fineGrainedPatterns.extend(result)
+				# print 'result',result
 
 	return fineGrainedPatterns

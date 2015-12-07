@@ -196,14 +196,17 @@ def drawPatterns(fineGrainedPatterns):
     index = 0
     count = 1
     for eachPattern in fineGrainedPatterns:
-        pl.figure(count)
-        pl.grid(True)
-        for eachSnippet in eachPattern[0]['points']:
-            pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index])# use pylab to plot x and y
-            pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index] + 'o')
-        count += 1
+        for eachCluster in eachPattern:
+            # print 'eachCluster',eachCluster
+            pl.figure(count)
+            pl.grid(True)
+            for eachSnippet in eachCluster['points']:
+                pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index])# use pylab to plot x and y
+                pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index] + 'o')
+             
+            count += 1
         index += 1
-        index = index%7  
+        index = index%7 
     pl.show()
 
 def figureStage(index, stages):
