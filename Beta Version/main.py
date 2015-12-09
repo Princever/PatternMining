@@ -2,16 +2,18 @@
 __author__ = 'Prince'
 
 from dataPrepare import *
-from prefixSpan import *
+from PrefixSpan import *
 import sys
 # import util as u
 from util import *
 from coarsePatternMining import *
 from splitPattern import *
 import time
+import copy
 
 if __name__ == "__main__":
-    database,places,allPlaces = dataPrepare()
+    database,allPlaces = dataPrepare()
+
     # for each in database:
     # 	print each
     deltaT = 180
@@ -26,7 +28,7 @@ if __name__ == "__main__":
 
     time1 = time.time()
 
-    patterns = prefixSpan(SquencePattern([], sys.maxint), database, deltaT, min_supp * count)
+    patterns = prefixSpan(SquencePattern([], sys.maxint, []), database, deltaT, min_supp * count)
     # print_patterns(patterns)  ###
 
     time2 = time.time()
@@ -50,6 +52,14 @@ if __name__ == "__main__":
     #         print "]",
     #     print ""
     # print places
+    allPatterns = []
+
+    for eachPattern in patterns:
+        if eachPattern.squence in maxSeqs:
+            allPatterns.append(eachPattern)
+
+    # print_patterns(allPatterns)
+
     maxSeqsBackUp = maxSeqs[:]
     # for each in database:
     # 	print each
@@ -58,7 +68,8 @@ if __name__ == "__main__":
     print 'maxSeqTime:',maxSeqTime
 
     time5 = time.time()
-    coarsePatterns = generateSnippets(maxSeqs, places, database, deltaT, allPlaces)
+    coarsePatterns = generateSnippets(allPatterns, allPlaces)
+    # print coarsePatterns
     # for eachp in coarsePatterns:
     # 	print eachp['pattern']
     # 	for eachs in eachp['snippets']:

@@ -84,6 +84,7 @@ def varOf(cluster):
 
 
 def splitPattern(snippets, supthreshold, varthreshold, bandwidth, dampeningfactor):
+	# print 'snoooooo',snippets
 	fineGrainedPatterns = []
 	gammaS = weightedSnippetShift(snippets, bandwidth, dampeningfactor)
 	for eachSi in gammaS:

@@ -10,12 +10,32 @@ import copy
 PLACE_HOLDER = '_'
 
 class SquencePattern:
-    def __init__(self, squence, support):
+    def __init__(self, squence, support, snippet):
         self.squence = []
-        # self.snippets = {}
+        self.snippets = []
         for s in squence:
             self.squence.append(list(s))
         self.support = support
+        self.snippets = snippet
+        # print 'sss',self.snippets
+
+    def mergeSnippet(self, snippet1, snippet2):
+        if snippet1 == []:
+            return snippet2
+        if snippet2 == []:
+            return snippet1
+        newSnippet = []
+        for each1 in snippet1:
+            for each2 in snippet2:
+                newids = list(set(each1['ids']).intersection(each2['ids']))
+                if newids != []:
+                    tmpSnippet = copy.deepcopy(each1['snippet'])
+                    tmpSnippet.extend(each2['snippet'])
+                    # print '1',each1['snippet']
+                    # print '2',each2['snippet']
+                    # print '3',tmpSnippet
+                    newSnippet.append({'snippet':tmpSnippet, 'ids':newids, 'weight':len(newids)})
+        return newSnippet
 
     def append(self, p):
         if p.squence[0][0] == PLACE_HOLDER:
@@ -26,15 +46,16 @@ class SquencePattern:
             self.squence.extend(p.squence[1:])
         else:
             self.squence.extend(p.squence)
+            self.snippets = self.mergeSnippet(self.snippets, p.snippets)
+            # print 'ss:',self.snippets
         self.support = min(self.support, p.support)
-
 
 def prefixSpan(pattern, S, deltaT, threshold):
     patterns = []
     f_list = frequent_items(S, pattern, deltaT, threshold)
 
     for i in f_list:
-        p = SquencePattern(pattern.squence, pattern.support)
+        p = SquencePattern(pattern.squence, pattern.support, pattern.snippets)
         p.append(i)
         patterns.append(p)
 
@@ -72,6 +93,12 @@ def detectTimeConstraint(element, deltaT):
         return False
     else:
         return True
+
+def transfer(snippet):
+    snippets = []
+    for eachPlace in snippet:
+        snippets.append({'snippet':[[eachPlace]], 'ids':snippet[eachPlace], 'weight':len(snippet[eachPlace])})
+    return snippets
 
 def frequent_items(S, pattern, deltaT, threshold):
     items = {}
@@ -133,6 +160,7 @@ def frequent_items(S, pattern, deltaT, threshold):
         # print 's:',s
         for element in s:
             item = element['place']['category']
+            name = element['place']['name']
             isTimeConstraint = detectTimeConstraint(element, deltaT)
             # print isTimeConstraint
             itemsAppear.setdefault(item,[])
@@ -141,16 +169,21 @@ def frequent_items(S, pattern, deltaT, threshold):
                 itemsAppear[item] += [trajectoryID]
                 counted.append(item)
                 if item in items:
-                    items[item] += 1
+                    if name in items[item]['snippet']:
+                        items[item]['snippet'][name] += [trajectoryID]
+                        items[item]['weight'] += 1
+                    else:
+                        items[item]['snippet'][name] = [trajectoryID]
+                        items[item]['weight'] += 1
                 else:
-                    items[item] = 1
+                    items[item] = {'snippet':{name:[trajectoryID]}, 'weight':1}
 
     # f_list.extend([SquencePattern([[PLACE_HOLDER, k]], v)
     #                for k, v in _items.iteritems()
     #                if v >= threshold])
-    f_list.extend([SquencePattern([[k]], v)
-                   for k, v in items.iteritems()
-                   if v >= threshold])
+    f_list.extend([SquencePattern([[k]], data['weight'], transfer(data['snippet']))
+                   for k, data in items.iteritems()
+                   if data['weight'] >= threshold])
 
     sorted_list = sorted(f_list, key=lambda p: p.support)
     return sorted_list
@@ -251,7 +284,7 @@ def print_patterns(patterns):
             aitem += ']'
             name += aitem
             name += ']'
-        print("pattern:{0}, support:{1}".format(name, p.support)) 
+        print("pattern:{0}, support:{1}, snippet:{2}".format(name, p.support, p.snippets)) 
         # print >> ff,("pattern:{0}, support:{1}".format(name, p.support))
 
 

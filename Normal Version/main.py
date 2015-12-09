@@ -2,7 +2,7 @@
 __author__ = 'Prince'
 
 from dataPrepare import *
-from prefixSpan import *
+from PrefixSpan import *
 import sys
 # import util as u
 from util import *
@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
     time5 = time.time()
     coarsePatterns = generateSnippets(maxSeqs, places, database, deltaT, allPlaces)
+    print coarsePatterns
     # for eachp in coarsePatterns:
     # 	print eachp['pattern']
     # 	for eachs in eachp['snippets']:

@@ -11,19 +11,19 @@ from util import *
 # 	""" --- no necessary --- """
 # 	return
 
-def generateCombination(currentCombination, currentPattern, places):
-    resultSet = []
-    pattern = currentPattern[:]
-    if currentPattern == []:
-        return [currentCombination]
-    else:
-        nextPlace = pattern.pop(0)
-        for eachCertainPlace in places[nextPlace[0]]:
-            lenthPlueOneCombination = currentCombination[:]
-            lenthPlueOneCombination.append([eachCertainPlace['name']])
-            generated = generateCombination(lenthPlueOneCombination, pattern, places)
-            resultSet.extend(generated)
-        return resultSet
+# def generateCombination(currentCombination, currentPattern, places):
+#     resultSet = []
+#     pattern = currentPattern[:]
+#     if currentPattern == []:
+#         return [currentCombination]
+#     else:
+#         nextPlace = pattern.pop(0)
+#         for eachCertainPlace in places[nextPlace[0]]:
+#             lenthPlueOneCombination = currentCombination[:]
+#             lenthPlueOneCombination.append([eachCertainPlace['name']])
+#             generated = generateCombination(lenthPlueOneCombination, pattern, places)
+#             resultSet.extend(generated)
+#         return resultSet
 
 # def generateCombinationWithTime(currentCombination, currentPattern, places):
 #     resultSet = []
@@ -51,38 +51,38 @@ def generateCombination(currentCombination, currentPattern, places):
 #         else:
 #             return resultSet
 
-def compactInfo(record):
-    info = []
-    for each in record['data']:
-        compactInfo = {'place':each['place']['name'], 'time':each['time']}
-        info.append(compactInfo)
-    return info
+# def compactInfo(record):
+#     info = []
+#     for each in record['data']:
+#         compactInfo = {'place':each['place']['name'], 'time':each['time']}
+#         info.append(compactInfo)
+#     return info
 
-def cutByDeltaT(record, deltaT):
-    # print record
-    result = []
-    tmp = []
-    ptime = 0
-    for eachPlace in record['data']:
-        ntime = eachPlace['time']
-        if ntime - ptime > deltaT:
-            result.append(tmp)
-            tmp = []
-        tmp.append([eachPlace['place']['name']])
-        ptime = ntime
-    result.append(tmp)
-    return result
+# def cutByDeltaT(record, deltaT):
+#     # print record
+#     result = []
+#     tmp = []
+#     ptime = 0
+#     for eachPlace in record['data']:
+#         ntime = eachPlace['time']
+#         if ntime - ptime > deltaT:
+#             result.append(tmp)
+#             tmp = []
+#         tmp.append([eachPlace['place']['name']])
+#         ptime = ntime
+#     result.append(tmp)
+#     return result
 
-def isInSeqWithTime(nseq,tseq,deltaT):
-    # print nseq
-    fixedRecords = cutByDeltaT(tseq, deltaT)
+# def isInSeqWithTime(nseq,tseq,deltaT):
+#     # print nseq
+#     fixedRecords = cutByDeltaT(tseq, deltaT)
 
-    for anySeq in fixedRecords:
-        if isContained(nseq, anySeq):
-            # print 'yes',nseq,anySeq
-            return True
-    # print 'no'
-    return False
+#     for anySeq in fixedRecords:
+#         if isContained(nseq, anySeq):
+#             # print 'yes',nseq,anySeq
+#             return True
+#     # print 'no'
+    # return False
 
     # allPossibleSeq = []
     # record = compactInfo(tseq)
@@ -127,36 +127,29 @@ def converToPoint(record, allPlaces):
 		matrix.append(coordinates)
 	return np.array(matrix)
 
-def generateSnippets(maxSeqs, places, database, deltaT, allPlaces):
+def generateSnippets(allPatterns, allPlaces):
     coarsePattern = []
-    generateCombinationTime = 0
-    generateTime = 0
 
-    for eachPattern in maxSeqs:
-        pattern = {'pattern':eachPattern, 'snippets':[]}
 
-        time1 = time.time()
-        allCombinations = generateCombination([], eachPattern, places)
-        time2 = time.time()
-        generateCombinationTime += time2 - time1
-        
-
-        time3 = time.time()
-        for each in allCombinations:
-            snippet = {'snippet':each, 'weight':0}
-            weight = 0
-            record = []
-            for eachRecord in database:
-                if isInSeqWithTime(each, eachRecord, deltaT):
-                	weight += 1
-            snippet['weight'] = weight
-            if snippet['weight'] != 0:
-            	snippet.setdefault('mat', converToPoint(each, allPlaces))
-                pattern['snippets'].append(snippet)
+    for eachPattern in allPatterns:
+        pattern = {'pattern':eachPattern.squence, 'snippets':[]}
+        for eachSnippet in eachPattern.snippets:
+            snippet = {'snippet':eachSnippet['snippet'], 'mat':converToPoint(eachSnippet['snippet'], allPlaces), 'weight':eachSnippet['weight']}
+            pattern['snippets'].append(snippet)
         coarsePattern.append(pattern)
-        time4 = time.time()
-        generateTime +=time4- time3
-        
-    print '    generateCombinationTime:',generateCombinationTime
-    print '    generateTime:',generateTime
+
     return coarsePattern
+
+
+
+
+
+
+
+
+
+
+
+
+
+

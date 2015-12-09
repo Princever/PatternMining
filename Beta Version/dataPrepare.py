@@ -21,7 +21,7 @@ def read(filename):    #read and sort the places
 
 def dataPrepare():	#genete datas
     filename = 'datas/places.csv'
-    size = 100
+    size = 10000
     ratio = 0.1
     minTimeConsistencyRatio = 2
     csvfileout = file('datas/trajectory.csv', 'wb')
@@ -74,4 +74,4 @@ def dataPrepare():	#genete datas
     	finaldatabase.append(trajectoryWithID)
     	count += 1
 
-    return finaldatabase,places,allPlaces
+    return finaldatabase,allPlaces

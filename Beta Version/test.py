@@ -5,6 +5,7 @@ from dataPrepare import *
 from util import *
 import numpy as np
 import pylab as pl
+import time
 
 # def getAllIndex(s,element):
 #     indices = []
@@ -160,9 +161,23 @@ if __name__ == "__main__":
     record2 = {'data': [{'place': {'category': 'office', 'loc': {'y': '11', 'x': '2'}, 'name': 'd'}, 'time': 0}, {'place': {'category': 'shop', 'loc': {'y': '8', 'x': '11'}, 'name': 'q'}, 'time': 127}, {'place': {'category': 'restaurant', 'loc': {'y': '29', 'x': '3'}, 'name': 'e'}, 'time': 175}, {'place': {'category': 'bar', 'loc': {'y': '20', 'x': '7'}, 'name': 'j'}, 'time': 571}], 'id': 137}
     record3 = {'data': [{'place': {'category': 'office', 'loc': {'y': '11', 'x': '2'}, 'name': 'd'}, 'time': 0}, {'place': {'category': 'shop', 'loc': {'y': '9', 'x': '11'}, 'name': 'p'}, 'time': 46}, {'place': {'category': 'restaurant', 'loc': {'y': '28', 'x': '4'}, 'name': 'h'}, 'time': 92}, {'place': {'category': 'bar', 'loc': {'y': '22', 'x': '19'}, 'name': 'z'}, 'time': 563}], 'id': 138}
 
-    print isContained([['d'],['g']],[['d'],['m'],['g']])
-    print isContained([['g'],['g'],['d']],[['g'],['d'],['d']])
-    print isContained([['g'],['d']],[['d'],['g'],['g']])
+    items = {}
+    items['aaa'] = {'snippet':{'name':{'database':[1], 'weight':1}}, 'weight':1}
+    items['bbb'] = {'snippet':{'name':{'database':[2], 'weight':1}}, 'weight':1}
+    items['ccc'] = {'snippet':{'name':{'database':[3], 'weight':1}}, 'weight':1}
+
+    a=[2,3,4,5]
+    b=[2,5,8]
+    time1 = time.time()
+    print list(set(a).intersection(set(b)))
+    time2 = time.time()
+    time4 = time.time()
+    print [val for val in a if val in b]
+    time3 = time.time()
+
+    print time2 - time1
+    print time3 - time4
+        # print s
 
 
 
