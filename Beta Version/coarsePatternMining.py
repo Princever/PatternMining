@@ -25,31 +25,31 @@ def generateCombination(currentCombination, currentPattern, places):
             resultSet.extend(generated)
         return resultSet
 
-def generateCombinationWithTime(currentCombination, currentPattern, places):
-    resultSet = []
-    pattern = currentPattern[:]
-    # print 'currentPattern:',currentPattern,' Type:',type(currentPattern)
-    if currentPattern == []:
-        # print currentCombination
-        return [currentCombination]
-    else:
-        nextPlace = pattern.pop(0)
-        # print places
-        for eachCertainPlace in places[nextPlace[0]]:
-            lenthPlueOneCombination = currentCombination[:]
-            # if lenthPlueOneCombination == []:
-            # print 'place:',eachCertainPlace
-            if lenthPlueOneCombination == [] or lenthPlueOneCombination[-1]['time'] < eachCertainPlace['time']:
-                lenthPlueOneCombination.append(eachCertainPlace)
-                generated = generateCombinationWithTime(lenthPlueOneCombination, pattern, places)
-            else:
-                generated = None
-            if generated is not None:
-                resultSet.extend(generated)
-        if resultSet == []:
-            return None
-        else:
-            return resultSet
+# def generateCombinationWithTime(currentCombination, currentPattern, places):
+#     resultSet = []
+#     pattern = currentPattern[:]
+#     # print 'currentPattern:',currentPattern,' Type:',type(currentPattern)
+#     if currentPattern == []:
+#         # print currentCombination
+#         return [currentCombination]
+#     else:
+#         nextPlace = pattern.pop(0)
+#         # print places
+#         for eachCertainPlace in places[nextPlace[0]]:
+#             lenthPlueOneCombination = currentCombination[:]
+#             # if lenthPlueOneCombination == []:
+#             # print 'place:',eachCertainPlace
+#             if lenthPlueOneCombination == [] or lenthPlueOneCombination[-1]['time'] < eachCertainPlace['time']:
+#                 lenthPlueOneCombination.append(eachCertainPlace)
+#                 generated = generateCombinationWithTime(lenthPlueOneCombination, pattern, places)
+#             else:
+#                 generated = None
+#             if generated is not None:
+#                 resultSet.extend(generated)
+#         if resultSet == []:
+#             return None
+#         else:
+#             return resultSet
 
 def compactInfo(record):
     info = []

@@ -19,6 +19,7 @@ class SquencePattern:
 
     def append(self, p):
         if p.squence[0][0] == PLACE_HOLDER:
+            print 'yes!!!!!!!!!!!!!'
             first_e = p.squence[0]
             first_e.remove(PLACE_HOLDER)
             self.squence[-1].extend(first_e)
