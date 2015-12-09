@@ -202,7 +202,7 @@ def build_projected_database(S, pattern):
                         break
 
             if is_prefix:
-                e_index = getAllIndex(s,element)
+                e_index = getAllIndex(s,element)    #full projection
                 # print 'elem:',element
                 # print 's:',s
                 # i_index = element.index(last_item)

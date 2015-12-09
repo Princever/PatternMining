@@ -78,10 +78,34 @@ def isContained(nseq,tseq):
     pos = 0
     for each in nseq:
         if each in tseq[pos:]:
-            pos = tseq.index(each) + 1
+            # print pos,tseq[pos:].index(each)
+            pos = pos + tseq[pos:].index(each) + 1
         else:
             return False
     return True
+
+    # require = len(nseq)
+    # bound = len(tseq)
+
+    # satisfy = 0
+
+    # if require > bound:
+    #     return False
+    # pos = 0
+    # count = 0
+    # for each in nseq:
+    #     if count == bound:
+    #             return False
+    #     for eachh in tseq[pos:]:
+    #         count += 1
+    #         if each == eachh:
+    #             satisfy += 1
+    #             if satisfy == require:
+    #                 return True
+    #             pos = count
+    #             break
+    #         if count == bound:
+    #             return False
 
 def isInSeq(nseq,tseq):
     result = []

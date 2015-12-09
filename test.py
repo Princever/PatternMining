@@ -161,8 +161,8 @@ if __name__ == "__main__":
     record3 = {'data': [{'place': {'category': 'office', 'loc': {'y': '11', 'x': '2'}, 'name': 'd'}, 'time': 0}, {'place': {'category': 'shop', 'loc': {'y': '9', 'x': '11'}, 'name': 'p'}, 'time': 46}, {'place': {'category': 'restaurant', 'loc': {'y': '28', 'x': '4'}, 'name': 'h'}, 'time': 92}, {'place': {'category': 'bar', 'loc': {'y': '22', 'x': '19'}, 'name': 'z'}, 'time': 563}], 'id': 138}
 
     print isContained([['d'],['g']],[['d'],['m'],['g']])
-    print isContained([['d'],['g']],[['d'],['d'],['g']])
-    print isContained([['g'],['g']],[['g'],['d'],['d']])
+    print isContained([['g'],['g'],['d']],[['g'],['d'],['d']])
+    print isContained([['g'],['d']],[['d'],['g'],['g']])
 
 
 
