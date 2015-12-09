@@ -25,7 +25,7 @@ def generateCombination(currentCombination, currentPattern, places):
             resultSet.extend(generated)
         return resultSet
 
-# def generateCombinationWithTime(currentCombination, currentPattern, places):
+# def generateCombinationWithTime(currentCombination, currentPattern, places): #
 #     resultSet = []
 #     pattern = currentPattern[:]
 #     # print 'currentPattern:',currentPattern,' Type:',type(currentPattern)

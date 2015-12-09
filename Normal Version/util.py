@@ -41,7 +41,7 @@ def getMapSeq(items,seqs):
     for custom in seqs:
         for basket in custom:
             for item in basket:
-                tmpbasket += [getMapNum(item,transmap)]
+                tmpbasket += [getMapNum(item,transmap)]#
             tmpcustom.append(tmpbasket)
             tmpbasket = []
         mapSeq.append(tmpcustom)

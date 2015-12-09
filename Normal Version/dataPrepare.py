@@ -5,7 +5,7 @@ import csv
 import numpy as np
 import random
 
-def read(filename):    #read and sort the places
+def read(filename):    #read and sort the places#
     places = {}
     allPlaces = {}
 

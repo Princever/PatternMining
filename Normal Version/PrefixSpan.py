@@ -29,7 +29,7 @@ class SquencePattern:
         self.support = min(self.support, p.support)
 
 
-def prefixSpan(pattern, S, deltaT, threshold):
+def prefixSpan(pattern, S, deltaT, threshold):#
     patterns = []
     f_list = frequent_items(S, pattern, deltaT, threshold)
 

@@ -42,7 +42,7 @@ import pylab as pl
 #         nextPlace = pattern.pop(0)
 #         # print places
 #         for eachCertainPlace in places[nextPlace[0]]:
-#             lenthPlueOneCombination = currentCombination[:]
+#             lenthPlueOneCombination = currentCombination[:]#
 #             # if lenthPlueOneCombination == []:
 #             # print lenthPlueOneCombination[-1]
 #             if lenthPlueOneCombination == [] or lenthPlueOneCombination[-1]['time'] < eachCertainPlace['time']:

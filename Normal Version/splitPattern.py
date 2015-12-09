@@ -41,7 +41,7 @@ def findInS(newCenter, gammaS):
 			break
 	return alreadyIn
 
-def weightedSnippetShift(snippets, bandwidth, dampeningfactor):
+def weightedSnippetShift(snippets, bandwidth, dampeningfactor):#
 	# epsilon = 0
 	gammaS = []
 	# print snippets
