@@ -72,6 +72,17 @@ def getTransmap(items):
 
     return transmap
 
+def isContained(nseq,tseq):
+    if len(nseq) > len(tseq):
+        return False
+    pos = 0
+    for each in nseq:
+        if each in tseq[pos:]:
+            pos = tseq.index(each) + 1
+        else:
+            return False
+    return True
+
 def isInSeq(nseq,tseq):
     result = []
     cp = 0
@@ -197,8 +208,8 @@ def drawPatterns(fineGrainedPatterns):
     count = 1
     for eachPattern in fineGrainedPatterns:
         for eachCluster in eachPattern:
-            print 'eachCluster',eachCluster
-            print ' '
+            # print 'eachCluster',eachCluster
+            # print ' '
             pl.figure(count)
             pl.grid(True)
             for eachSnippet in eachCluster['points']:

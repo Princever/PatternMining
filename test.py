@@ -2,7 +2,7 @@
 __author__ = 'Prince'
 
 from dataPrepare import *
-# from util import *
+from util import *
 import numpy as np
 import pylab as pl
 
@@ -110,32 +110,62 @@ def distance(point1, point2):
 	distance = np.linalg.norm(tmp,ord=None)
 	return distance
 
+def cutByDeltaT(record, deltaT):
+    result = []
+    tmp = []
+    ptime = 0
+    for eachPlace in record['data']:
+        ntime = eachPlace['time']
+        if ntime - ptime > deltaT:
+            result.append(tmp)
+            tmp = []
+        tmp.append([eachPlace['place']['name']])
+        ptime = ntime
+    result.append(tmp)
+    return result
+
+def fliter(record):
+    result = []
+    for eachPlace in record['data']:
+        result.append([eachPlace['place']['name']])
+    return result
 
 if __name__ == "__main__":
 
-    gammaS = [{'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}]
-    eachSi = {'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}
+    # gammaS = [{'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}]
+    # eachSi = {'points': [{'snippet': [['b'], ['s'], ['t']], 'mat': [[ 1, 14],[12, 12],[14, 30]], 'weight': 1}], 'center': [[ 1, 14],[12, 12],[14, 30]]}
     # print gammaS
     # print eachSi
 
     # gammaS.remove(eachSi)
     # print gammaS
 
-    amat = [[1, 14],[12, 12],[14, 30]]
+    # amat = [[1, 14],[12, 12],[14, 30]]
 
-    mat = np.array(amat)
+    # mat = np.array(amat)
 
-    l = [x[0] for x in mat]
+    # l = [x[0] for x in mat]
 
-    color = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    # color = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
-    pl.plot([x[0] for x in mat], [x[1] for x in mat], color[3])# use pylab to plot x and y
-    pl.plot([x[0] for x in mat], [x[1] for x in mat], color[3]+'o')    
-    pl.show()
+    # pl.plot([x[0] for x in mat], [x[1] for x in mat], color[3])# use pylab to plot x and y
+    # pl.plot([x[0] for x in mat], [x[1] for x in mat], color[3]+'o')    
+    # pl.show()
 
-    print l
+    # print l
 
-    print 7%7
+    # print 7%7
+
+    record1 = {'data': [{'place': {'category': 'office', 'loc': {'y': '19', 'x': '8'}, 'name': 'l'}, 'time': 0}, {'place': {'category': 'shop', 'loc': {'y': '12', 'x': '12'}, 'name': 's'}, 'time': 104}, {'place': {'category': 'restaurant', 'loc': {'y': '29', 'x': '5'}, 'name': 'f'}, 'time': 149}, {'place': {'category': 'bar', 'loc': {'y': '20', 'x': '8'}, 'name': 'k'}, 'time': 286}], 'id': 136}
+    record2 = {'data': [{'place': {'category': 'office', 'loc': {'y': '11', 'x': '2'}, 'name': 'd'}, 'time': 0}, {'place': {'category': 'shop', 'loc': {'y': '8', 'x': '11'}, 'name': 'q'}, 'time': 127}, {'place': {'category': 'restaurant', 'loc': {'y': '29', 'x': '3'}, 'name': 'e'}, 'time': 175}, {'place': {'category': 'bar', 'loc': {'y': '20', 'x': '7'}, 'name': 'j'}, 'time': 571}], 'id': 137}
+    record3 = {'data': [{'place': {'category': 'office', 'loc': {'y': '11', 'x': '2'}, 'name': 'd'}, 'time': 0}, {'place': {'category': 'shop', 'loc': {'y': '9', 'x': '11'}, 'name': 'p'}, 'time': 46}, {'place': {'category': 'restaurant', 'loc': {'y': '28', 'x': '4'}, 'name': 'h'}, 'time': 92}, {'place': {'category': 'bar', 'loc': {'y': '22', 'x': '19'}, 'name': 'z'}, 'time': 563}], 'id': 138}
+
+    print isContained([['d'],['g']],[['d'],['m'],['g']])
+    print isContained([['d'],['g']],[['d'],['d'],['g']])
+    print isContained([['g'],['g']],[['g'],['d'],['d']])
+
+
+
 
 
 

@@ -250,7 +250,7 @@ def print_patterns(patterns):
             aitem += ']'
             name += aitem
             name += ']'
-        print("pattern:{0}, support:{1}".format(name, p.support))
+        print("pattern:{0}, support:{1}".format(name, p.support)) 
         # print >> ff,("pattern:{0}, support:{1}".format(name, p.support))
 
 
