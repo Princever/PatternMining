@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     time5 = time.time()
     coarsePatterns = generateSnippets(maxSeqs, places, database, deltaT, allPlaces)
-    print coarsePatterns
+    # print coarsePatterns
     # for eachp in coarsePatterns:
     # 	print eachp['pattern']
     # 	for eachs in eachp['snippets']:
@@ -73,7 +73,8 @@ if __name__ == "__main__":
     for eachPattern in coarsePatterns:
         tmpResult = splitPattern(eachPattern['snippets'], min_supp * count, varthreshold, bandwidth, dampeningfactor)
         if tmpResult != []:
-        	fineGrainedPatterns.append(tmpResult)
+            singlePattern = {'pattern':eachPattern['pattern'], 'snippets':tmpResult}
+            fineGrainedPatterns.append(singlePattern)
     # for eachPattern in fineGrainedPatterns:   ###
         # print 'A Pattern:',eachPattern    ###
     time8 = time.time()

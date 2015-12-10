@@ -231,11 +231,12 @@ def drawPatterns(fineGrainedPatterns):
     index = 0
     count = 1
     for eachPattern in fineGrainedPatterns:
-        for eachCluster in eachPattern:
+        for eachCluster in eachPattern['snippets']:
             # print 'eachCluster',eachCluster
             # print ' '
             pl.figure(count)
             pl.grid(True)
+            pl.title(eachPattern['pattern'])
             for eachSnippet in eachCluster['points']:
                 pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index])# use pylab to plot x and y
                 pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index] + 'o') 
