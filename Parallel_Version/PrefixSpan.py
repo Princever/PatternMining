@@ -4,6 +4,7 @@ __author__ = 'Prince'
 import sys
 import util as u
 import copy
+from pyspark import SparkContext
 
 
 
@@ -39,7 +40,7 @@ class SquencePattern:
 
     def append(self, p):
         if p.squence[0][0] == PLACE_HOLDER:
-            print 'yes!!!!!!!!!!!!!'
+            # print 'yes!!!!!!!!!!!!!'
             first_e = p.squence[0]
             first_e.remove(PLACE_HOLDER)
             self.squence[-1].extend(first_e)
@@ -50,9 +51,59 @@ class SquencePattern:
             # print 'ss:',self.snippets
         self.support = min(self.support, p.support)
 
-def prefixSpan(pattern, S, deltaT, threshold):
+# def paraPartPrefixSpan(i, patterns, pattern, S, deltaT, threshold, control):
+#     tmpPatterns = copy.deepcopy(patterns)
+
+#     p = SquencePattern(pattern.squence, pattern.support, pattern.snippets)
+#     p.append(i)
+#     tmpPatterns.append(p)
+#     scpd = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'PatternMining_projectDatabase', pyFiles=['/home/zxu/Parallel_Version/PrefixSpan.py', '/home/zxu/Parallel_Version/util.py'])
+#     p_S = build_projected_databaseD(S, p, scpd)
+
+#     if control[0] >= control[1]: 
+#         p_patterns = prefixSpan(p, p_S, deltaT, threshold, scpd)
+#         scpd.stop()
+#     else:
+#         scpd.stop()
+#         p_patterns = prefixSpanD(p, p_S, deltaT, threshold, [control[0]+1, control[1]])
+
+#     # print '________________________', type(p_patterns),p_patterns
+
+#     tmpPatterns.extend(p_patterns)
+#     return tmpPatterns
+
+def gup(x, y):
+    # print 'x:',x,'xType:',type(x)
+    # print 'y:',y,'yType:',type(y)
+    x.extend(y)
+    return x
+
+# def prefixSpanD(pattern, S, deltaT, threshold, control):
+
+#     patterns = []
+#     f_list = frequent_items(S, deltaT, threshold)
+
+#     # for i in f_list:
+#     #     p = SquencePattern(pattern.squence, pattern.support, pattern.snippets)
+#     #     p.append(i)
+#     #     patterns.append(p)
+
+#         # p_S = build_projected_database(S, p)
+#         # # print 'ps:',p_S
+#         # p_patterns = prefixSpan(p, p_S, deltaT, threshold)
+#         # patterns.extend(p_patterns)
+#     if len(f_list) == 0:
+#         return []
+#     else:
+#         sc = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'PatternMining_PrefixSpan', pyFiles=['/home/zxu/Parallel_Version/PrefixSpan.py','/home/zxu/Parallel_Version/util.py'])
+#         patternsG = sc.parallelize(f_list).map(lambda i: paraPartPrefixSpan(i, patterns, pattern, S, deltaT, threshold, control)).reduce(gup)
+#     # patterns.extend(patternsG)
+#         sc.stop()
+#         return patternsG
+
+def prefixSpan(pattern, S, deltaT, threshold, scfi):
     patterns = []
-    f_list = frequent_items(S, pattern, deltaT, threshold)
+    f_list = frequent_itemsD(S, deltaT, threshold, scfi)
 
     for i in f_list:
         p = SquencePattern(pattern.squence, pattern.support, pattern.snippets)
@@ -61,7 +112,7 @@ def prefixSpan(pattern, S, deltaT, threshold):
 
         p_S = build_projected_database(S, p)
         # print 'ps:',p_S
-        p_patterns = prefixSpan(p, p_S, deltaT, threshold)
+        p_patterns = prefixSpan(p, p_S, deltaT, threshold, scfi)
         patterns.extend(p_patterns)
 
     return patterns
@@ -100,93 +151,110 @@ def transfer(snippet):
         snippets.append({'snippet':[[eachPlace]], 'ids':snippet[eachPlace], 'weight':len(snippet[eachPlace])})
     return snippets
 
-def frequent_items(S, pattern, deltaT, threshold):
+def paraCountFrequentItem(line, deltaT):
     items = {}
-    itemsAppear = {}
-    f_list = []
-    # for each in Source:
-    #     print each
 
-    # S = timeConstraint(Source, deltaT)
-    # for each in S:
-    #     print each
+    s = line['data'] #get data
+
+    trajectoryID = line['id'] #get line id
+
+    # counted = []
+
+    for element in s:
+        item = element['place']['category']
+        name = element['place']['name']
+        isTimeConstraint = detectTimeConstraint(element, deltaT)
+        if isTimeConstraint:
+            # if item not in counted:
+                # counted.append(item)
+            if item in items:#exist category
+                if name not in items[item]['snippet']:#new place
+                    items[item]['snippet'][name] = [trajectoryID]
+                    # items[item]['snippet'][name] += [trajectoryID]
+                    # items[item]['weight'] += 1
+                # else:#new place
+                #     items[item]['snippet'][name] = [trajectoryID]
+                #     items[item]['weight'] += 1
+            else:#new category
+                items[item] = {'snippet':{name:[trajectoryID]}, 'weight':1}
+
+    return items
+
+def gufi(x, y):
+    for category, data in y.iteritems():
+        if category in x.keys():
+            for places, ids in data['snippet'].iteritems():
+                if places in x[category]['snippet'].keys():
+                    x[category]['snippet'][places].extend(ids)
+                    tmplist = {}.fromkeys(x[category]['snippet'][places]).keys()
+                    x[category]['snippet'][places] = tmplist
+                else:
+                    x[category]['snippet'][places] = ids
+        else:
+            x[category] = data
+        ttlist = []
+        for places, ids in x[category]['snippet'].iteritems():
+            ttlist.extend(ids)
+        tmplist = {}.fromkeys(ttlist).keys()
+        x[category]['weight'] = len(tmplist)
+    return x
+
+def frequent_itemsD(S, deltaT, threshold, scfi):
+
+    f_list = []
+
     if S is None or len(S) == 0:
         return []
 
-    if len(pattern.squence) != 0:
-        last_e = pattern.squence[-1]
-    else:
-        last_e = []
-
-    for line in S:
-        # print 'data:',data
-
-        s = line['data']
-        # print s
-        trajectoryID = line['id']
-        # print trajectoryID
-
-        #class 1
-        # is_prefix = True
-        # for item in last_e:
-        #     if item not in s[0]:
-        #         is_prefix = False
-        #         break
-        # if is_prefix and len(last_e) > 0:
-        #     # print 'is_prefix'
-        #     index = s[0].index(last_e[-1])
-            # if index < len(s[0]) - 1:
-            #     # print 'hit1'
-            #     for item in s[0][index + 1:]:
-            #         if item in _items:
-            #             _items[item] += 1
-            #             # print 'hit2'
-            #         else:
-            #             _items[item] = 1
-            #             # print 'hit3'
-
-        #class 2    #no necessary
-        # if PLACE_HOLDER in s[0]:
-        #     print 'class22222222222222'
-        #     for item in s[0][1:]:
-        #         if item in _items:
-        #             _items[item] += 1
-        #         else:
-        #             _items[item] = 1
-        #     s = s[1:]
-
-        #class 3
-        counted = []
-        # print 's:',s
-        for element in s:
-            item = element['place']['category']
-            name = element['place']['name']
-            isTimeConstraint = detectTimeConstraint(element, deltaT)
-            # print isTimeConstraint
-            itemsAppear.setdefault(item,[])
-            if item not in counted and trajectoryID not in itemsAppear[item] and isTimeConstraint:
-                # print 'notcounted'
-                itemsAppear[item] += [trajectoryID]
-                counted.append(item)
-                if item in items:
-                    if name in items[item]['snippet']:
-                        items[item]['snippet'][name] += [trajectoryID]
-                        items[item]['weight'] += 1
-                    else:
-                        items[item]['snippet'][name] = [trajectoryID]
-                        items[item]['weight'] += 1
-                else:
-                    items[item] = {'snippet':{name:[trajectoryID]}, 'weight':1}
-
-    # f_list.extend([SquencePattern([[PLACE_HOLDER, k]], v)
-    #                for k, v in _items.iteritems()
-    #                if v >= threshold])
+    items = scfi.parallelize(S).map(lambda line: paraCountFrequentItem(line, deltaT)).reduce(gufi)
+#    print items
     f_list.extend([SquencePattern([[k]], data['weight'], transfer(data['snippet']))
                    for k, data in items.iteritems()
                    if data['weight'] >= threshold])
 
     sorted_list = sorted(f_list, key=lambda p: p.support)
-    return sorted_list
+    return sorted_list    
+
+# def frequent_items(S, deltaT, threshold):
+#     items = {}
+#     itemsAppear = {}
+#     f_list = []
+
+#     if S is None or len(S) == 0:
+#         return []
+
+#     for line in S:
+
+#         s = line['data']
+
+#         trajectoryID = line['id']
+
+#         counted = []
+
+#         for element in s:
+#             item = element['place']['category']
+#             name = element['place']['name']
+#             isTimeConstraint = detectTimeConstraint(element, deltaT)
+#             itemsAppear.setdefault(item,[])
+#             if item not in counted and trajectoryID not in itemsAppear[item] and isTimeConstraint:
+#                 itemsAppear[item] += [trajectoryID]
+#                 counted.append(item)
+#                 if item in items:
+#                     if name in items[item]['snippet']:
+#                         items[item]['snippet'][name] += [trajectoryID]
+#                         items[item]['weight'] += 1
+#                     else:
+#                         items[item]['snippet'][name] = [trajectoryID]
+#                         items[item]['weight'] += 1
+#                 else:
+#                     items[item] = {'snippet':{name:[trajectoryID]}, 'weight':1}
+
+#     f_list.extend([SquencePattern([[k]], data['weight'], transfer(data['snippet']))
+#                    for k, data in items.iteritems()
+#                    if data['weight'] >= threshold])
+
+#     sorted_list = sorted(f_list, key=lambda p: p.support)
+#     return sorted_list
 
 def simple(record):
     s = []
@@ -207,6 +275,51 @@ def getAllIndex(s,element):
         count += 1
     return indices
 
+# def paraProjectedDataBase(i, last_e):
+#     p_S = []
+#     f_s = simple(i)
+#     # print f_s
+#     s = f_s['data']
+#     trajectoryID = f_s['id']
+#     # print 's:',s
+#     for element in s:   #places
+#         is_prefix = True
+#         for item in last_e:
+#             if item not in element:
+#                 is_prefix = False
+#                 break
+
+#         if is_prefix:
+#             e_index = getAllIndex(s,element)    #full projection
+
+#             for eachIndex in e_index:
+#                 gapTime = i['data'][eachIndex]['time']
+#                 p_sTmp = i['data'][eachIndex + 1:]
+#                 p_s = []
+#                 for each in p_sTmp:
+#                     eachh = copy.deepcopy(each)
+#                     eachh['time'] -= gapTime
+#                     p_s.append(eachh)
+#                 if len(p_s) != 0:
+#                     fp_s = {'data':p_s, 'id':trajectoryID}
+#                     p_S.append(fp_s)
+
+#     return p_S
+
+
+# def build_projected_databaseD(S, pattern, scpd):
+#     """
+#     suppose S is projected database base on pattern's prefix,
+#     so we only need to use the last element in pattern to
+#     build projected database
+#     """
+#     last_e = pattern.squence[-1]
+
+#     p_S = scpd.parallelize(S).map(lambda i: paraProjectedDataBase(i, last_e)).reduce(gup)
+    
+
+#     return p_S
+
 def build_projected_database(S, pattern):
     """
     suppose S is projected database base on pattern's prefix,
@@ -215,7 +328,6 @@ def build_projected_database(S, pattern):
     """
     p_S = []
     last_e = pattern.squence[-1]
-    last_item = last_e[-1]
     for ase in S: #a sequense
         p_s = []
         f_s = simple(ase)
@@ -224,16 +336,11 @@ def build_projected_database(S, pattern):
         trajectoryID = f_s['id']
         # print 's:',s
         for element in s:   #places
-            is_prefix = False
-            if PLACE_HOLDER in element:
-                if last_item in element and len(pattern.squence[-1]) > 1:
-                    is_prefix = True
-            else:
-                is_prefix = True
-                for item in last_e:
-                    if item not in element:
-                        is_prefix = False
-                        break
+            is_prefix = True
+            for item in last_e:
+                if item not in element:
+                    is_prefix = False
+                    break
 
             if is_prefix:
                 e_index = getAllIndex(s,element)    #full projection

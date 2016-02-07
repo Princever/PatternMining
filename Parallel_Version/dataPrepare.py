@@ -22,8 +22,7 @@ def read(filename):    #read and sort the places
 def dataPrepare():	#genete datas
     filename = 'datas/places.csv'
     size = 10000
-
-    ratio = 0.3
+    ratio = 0.4
     minTimeConsistencyRatio = 2
     csvfileout = file('datas/trajectory.csv', 'wb')
     writer = csv.writer(csvfileout)

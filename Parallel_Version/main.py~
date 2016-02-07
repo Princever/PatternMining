@@ -12,12 +12,12 @@ import time
 import copy
 
 if __name__ == "__main__":
+    ff = open('datas/time.txt','w')
     database,allPlaces = dataPrepare()
+    
 
-    # for each in database:
-    # 	print each
     deltaT = 180
-    min_supp = 0.03#0.03 perfect, 0.01 for more potential, 0.05 is consist but not serious
+    min_supp = 0.03
     varthreshold = 2
     bandwidth = 20
     dampeningfactor = 0.5
@@ -27,14 +27,19 @@ if __name__ == "__main__":
         count += 1
 
     time1 = time.time()
-
-    patterns = prefixSpan(SquencePattern([], sys.maxint, []), database, deltaT, min_supp * count)
+    # maxLevel = 1
+    # control = [0, maxLevel-1]
+    # if maxLevel == 0:
+    scfi = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'PatternMining_frequentItem', pyFiles=['/home/zxu/Parallel_Version/PrefixSpan.py', '/home/zxu/Parallel_Version/util.py'])
+    patterns = prefixSpan(SquencePattern([], sys.maxint, []), database, deltaT, min_supp * count, scfi)
+    scfi.stop()
+    # else:
+        # patterns = prefixSpanD(SquencePattern([], sys.maxint, []), database, deltaT, min_supp * count, control)
     # print_patterns(patterns)  ###
-
     time2 = time.time()
 
     prefixSpanTime = time2 - time1
-    print 'prefixSpanTime:',prefixSpanTime
+    print >> ff,'prefixSpanTime:',prefixSpanTime
 
     time3 = time.time()
 
@@ -42,54 +47,49 @@ if __name__ == "__main__":
     for each in patterns:
         seqNums.append(each.squence)
     maxSeqs = maxSeq(seqNums)
-    # print maxSeqs
-    # print("The sequential patterns :")
-    # for i in maxSeqs:
-    #     for sth in i:
-    #         print "[",
-    #         for ssth in sth:
-    #             print ssth,
-    #         print "]",
-    #     print ""
-    # print places
+
     allPatterns = []
 
     for eachPattern in patterns:
         if eachPattern.squence in maxSeqs:
             allPatterns.append(eachPattern)
 
-    # print_patterns(allPatterns)
+
 
     maxSeqsBackUp = maxSeqs[:]
-    # for each in database:
-    # 	print each
+
     time4 = time.time()
     maxSeqTime = time4 - time3
-    print 'maxSeqTime:',maxSeqTime
+    print >> ff,'maxSeqTime:',maxSeqTime
+
+    # for each in maxSeqs:
+    #     print each
 
     time5 = time.time()
     coarsePatterns = generateSnippets(allPatterns, allPlaces)
-    # print coarsePatterns
-    # for eachp in coarsePatterns:
-    # 	print eachp['pattern']
-    # 	for eachs in eachp['snippets']:
-    # 		print eachs
+
     time6 = time.time()
     coarsePatternsTime = time6 - time5
-    print 'coarsePatternsTime:',coarsePatternsTime
+    print >> ff,'coarsePatternsTime:',coarsePatternsTime
 
     time7 = time.time()
+
+    sc = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'PatternMining_SplitPattern', pyFiles=['/home/zxu/Parallel_Version/splitPattern.py', '/home/zxu/Parallel_Version/util.py'])
+
     fineGrainedPatterns = []
     for eachPattern in coarsePatterns:
-        tmpResult = splitPattern(eachPattern['snippets'], min_supp * count, varthreshold, bandwidth, dampeningfactor)
+        tmpResult = splitPattern(eachPattern['snippets'], min_supp * count, varthreshold, bandwidth, dampeningfactor, sc)
         if tmpResult != []:
             singlePattern = {'pattern':eachPattern['pattern'], 'snippets':tmpResult}
             fineGrainedPatterns.append(singlePattern)
     # for eachPattern in fineGrainedPatterns:   ###
         # print 'A Pattern:',eachPattern    ###
+
+    sc.stop()
+
     time8 = time.time()
     fineGrainedPatternsTime = time8 - time7
-    print 'fineGrainedPatternsTime:',fineGrainedPatternsTime  
+    print >> ff,'fineGrainedPatternsTime:',fineGrainedPatternsTime  
 
     drawPatterns(fineGrainedPatterns)
 

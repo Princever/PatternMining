@@ -5,9 +5,9 @@ import copy
 import csv
 import numpy as np
 import pylab as pl
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# import sys
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 def getItems(seqs):
     items = []
@@ -241,6 +241,7 @@ def drawPatterns(fineGrainedPatterns):
                 pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index])# use pylab to plot x and y
                 pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index] + 'o') 
             count += 1
+#            pl.savefig('results/123.png')
         index += 1
         index = index%7 
     pl.show()

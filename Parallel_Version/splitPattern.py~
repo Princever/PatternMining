@@ -4,6 +4,7 @@ __author__ = 'Prince'
 import numpy as np
 import math
 import copy
+from pyspark import SparkContext
 
 def distance(point1, point2):
 	tmp = point1 - point2
@@ -63,6 +64,63 @@ def weightedSnippetShift(snippets, bandwidth, dampeningfactor):
 			k = k + 1
 	return gammaS
 
+def paraGenGammaS(i, snippets, bandwidth, dampeningfactor):
+	center = []
+	k = 0
+	# print 'asnip',eachSnippet
+	center.append(i['mat'])
+	while True:
+		pointSet = findPointsInRange(snippets, center[k], bandwidth, dampeningfactor)
+		newCenter = findNewCenter(pointSet)
+		center.append(newCenter)
+		if distance(center[k + 1], center[k]) == 0:
+			# alreadyIn = findInS(newCenter, gammaS)
+			# if not alreadyIn :
+			aCluster = {'center':center[k + 1], 'points':pointSet}
+			return [aCluster]
+		k = k + 1
+
+def gug(x, y):
+	newCenter = y[0]['center']
+	gammaS = x
+	alreadyIn = findInS(newCenter, gammaS)
+	if not alreadyIn :
+		x.extend(y)
+	return x
+
+def weightedSnippetShiftD(snippets, bandwidth, dampeningfactor, sc):
+	# epsilon = 0
+	# gammaS = []
+	# print snippets
+	if len(snippets) == 0:
+		return []
+	else:
+	#	sc = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'Prefix', pyFiles=['/home/zxu/Parallel_Version/splitPattern.py', '/home/zxu/Parallel_Version/util.py'])
+		gammaS = sc.parallelize(snippets).map(lambda i: paraGenGammaS(i, snippets, bandwidth, dampeningfactor)).reduce(gug)
+	# patterns.extend(patternsG)
+	#	sc.stop()
+		return gammaS
+
+
+
+	# for eachSnippet in snippets:
+	# 	center = []
+	# 	k = 0
+	# 	# print 'asnip',eachSnippet
+	# 	center.append(eachSnippet['mat'])
+	# 	while True:
+	# 		pointSet = findPointsInRange(snippets, center[k], bandwidth, dampeningfactor)
+	# 		newCenter = findNewCenter(pointSet)
+	# 		center.append(newCenter)
+	# 		if distance(center[k + 1], center[k]) == 0:
+	# 			alreadyIn = findInS(newCenter, gammaS)
+	# 			if not alreadyIn :
+	# 				aCluster = {'center':center[k + 1], 'points':pointSet}
+	# 				gammaS.append(aCluster)
+	# 			break
+	# 		k = k + 1
+	# return gammaS
+
 def supOf(cluster):
 	sup = 0
 	# print cluster
@@ -83,14 +141,14 @@ def varOf(cluster):
 # def	gammaCommunities(gammaS, gamma):
 
 
-def splitPattern(snippets, supthreshold, varthreshold, bandwidth, dampeningfactor):
+def splitPattern(snippets, supthreshold, varthreshold, bandwidth, dampeningfactor, sc):
 	fineGrainedPatterns = []
-	gammaS = weightedSnippetShift(snippets, bandwidth, dampeningfactor)
+	gammaS = weightedSnippetShiftD(snippets, bandwidth, dampeningfactor, sc)
 	for eachSi in gammaS:
 		if supOf(eachSi) >= supthreshold and varOf(eachSi) <= varthreshold:
 		# if True:
 			fineGrainedPatterns.append(eachSi)
-			gammaS.remove(eachSi)         
+			gammaS.remove()         
 
 	# gamma = math.sqrt(2) * dampeningfactor * bandwidth
 	gammaC = copy.deepcopy(gammaS)
@@ -99,8 +157,8 @@ def splitPattern(snippets, supthreshold, varthreshold, bandwidth, dampeningfacto
 	# 	print eachii
 
 	for eachCi in gammaC:
-		if supOf(eachSi) >= supthreshold:
-			result = splitPattern(eachCi['points'], supthreshold, varthreshold, dampeningfactor * bandwidth, dampeningfactor)
+		if supOf(eachCi) >= supthreshold:
+			result = splitPattern(eachCi['points'], supthreshold, varthreshold, dampeningfactor * bandwidth, dampeningfactor, sc)
 			if result != []:
 				fineGrainedPatterns.extend(result)
 				# print 'result',result

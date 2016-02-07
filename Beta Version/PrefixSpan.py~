@@ -50,45 +50,28 @@ class SquencePattern:
             # print 'ss:',self.snippets
         self.support = min(self.support, p.support)
 
-def print_pattern(p):
-    name = '['
-    for each in p.squence:
-        aitem = '['
-        flag = False
-        for item in each:
-            if flag:
-                aitem += '&'
-            aitem += item
-            flag = True
-        aitem += ']'
-        name += aitem
-        name += ']'
-    print("pattern:{0}, support:{1}, snippet:{2}".format(name, p.support, p.snippets)) 
-    # print >> ff,("pattern:{0}, support:{1}".format(name, p.support))
+def prefixSpanD(pattern, S, deltaT, threshold):
+    patterns = []
+    f_list = frequent_items(S, pattern, deltaT, threshold)
 
-def print_patterns(patterns):
-    for p in patterns:
-        name = '['
-        for each in p.squence:
-            aitem = '['
-            flag = False
-            for item in each:
-                if flag:
-                    aitem += '&'
-                aitem += item
-                flag = True
-            aitem += ']'
-            name += aitem
-            name += ']'
-        print("pattern:{0}, support:{1}, snippet:{2}".format(name, p.support, p.snippets)) 
-        # print >> ff,("pattern:{0}, support:{1}".format(name, p.support))
+    for i in f_list:
+        p = SquencePattern(pattern.squence, pattern.support, pattern.snippets)
+        p.append(i)
+        patterns.append(p)
+
+        p_S = build_projected_database(S, p)
+        # print 'ps:',p_S
+        p_patterns = prefixSpan(p, p_S, deltaT, threshold)
+        # print p_patterns
+        patterns.extend(p_patterns)
+
+    return patterns
 
 def prefixSpan(pattern, S, deltaT, threshold):
     patterns = []
     f_list = frequent_items(S, pattern, deltaT, threshold)
 
     for i in f_list:
-        # print_pattern(i)
         p = SquencePattern(pattern.squence, pattern.support, pattern.snippets)
         p.append(i)
         patterns.append(p)
@@ -193,7 +176,7 @@ def frequent_items(S, pattern, deltaT, threshold):
         counted = []
         # print 's:',s
         for element in s:
-#            print element
+            print element
             item = element['place']['category']
             name = element['place']['name']
             isTimeConstraint = detectTimeConstraint(element, deltaT)
@@ -212,12 +195,10 @@ def frequent_items(S, pattern, deltaT, threshold):
                         items[item]['weight'] += 1
                 else:
                     items[item] = {'snippet':{name:[trajectoryID]}, 'weight':1}
-                
-                
+
     # f_list.extend([SquencePattern([[PLACE_HOLDER, k]], v)
     #                for k, v in _items.iteritems()
     #                if v >= threshold])
-    # print items
     f_list.extend([SquencePattern([[k]], data['weight'], transfer(data['snippet']))
                    for k, data in items.iteritems()
                    if data['weight'] >= threshold])
@@ -309,7 +290,22 @@ def build_projected_database(S, pattern):
     return p_S
 
 
-
+def print_patterns(patterns):
+    for p in patterns:
+        name = '['
+        for each in p.squence:
+            aitem = '['
+            flag = False
+            for item in each:
+                if flag:
+                    aitem += '&'
+                aitem += item
+                flag = True
+            aitem += ']'
+            name += aitem
+            name += ']'
+        print("pattern:{0}, support:{1}, snippet:{2}".format(name, p.support, p.snippets)) 
+        # print >> ff,("pattern:{0}, support:{1}".format(name, p.support))
 
 
 
