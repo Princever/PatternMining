@@ -1,4 +1,4 @@
-prefixSpanTime: 197.523735046
-maxSeqTime: 0.0170390605927
-coarsePatternsTime: 0.0523278713226
-fineGrainedPatternsTime: 66.2478749752
+prefixSpanTime: 166.255144119
+maxSeqTime: 0.011344909668
+coarsePatternsTime: 0.0535280704498
+fineGrainedPatternsTime: 53.1698789597

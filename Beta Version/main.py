@@ -19,7 +19,7 @@ if __name__ == "__main__":
     deltaT = 180
     min_supp = 0.03#0.03 perfect, 0.01 for more potential, 0.05 is consist but not serious
     varthreshold = 2
-    bandwidth = 20
+    bandwidth = 15
     dampeningfactor = 0.5
 
     count = 0

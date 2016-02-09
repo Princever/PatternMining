@@ -19,7 +19,7 @@ if __name__ == "__main__":
     deltaT = 180
     min_supp = 0.03
     varthreshold = 2
-    bandwidth = 20
+    bandwidth = 18
     dampeningfactor = 0.5
 
     count = 0
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     fineGrainedPatternsTime = time8 - time7
     print >> ff,'fineGrainedPatternsTime:',fineGrainedPatternsTime  
 
-#    drawPatterns(fineGrainedPatterns)
+    drawPatterns(fineGrainedPatterns)
 
 
 

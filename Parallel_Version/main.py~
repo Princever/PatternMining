@@ -19,8 +19,8 @@ if __name__ == "__main__":
     deltaT = 180
     min_supp = 0.03
     varthreshold = 2
-    bandwidth = 20
-    dampeningfactor = 0.5
+    bandwidth = 18
+    dampeningfactor = 0.3
 
     count = 0
     for each in database:

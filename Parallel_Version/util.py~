@@ -241,10 +241,10 @@ def drawPatterns(fineGrainedPatterns):
                 pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index])# use pylab to plot x and y
                 pl.plot([x[0] for x in eachSnippet['mat']], [x[1] for x in eachSnippet['mat']], color[index] + 'o') 
             count += 1
-            pl.savefig('results/123.png')
+            pl.savefig("results/" + str(index) + str(count) + ".png")
         index += 1
         index = index%7 
-    #pl.show()
+#    pl.show()
 
 def figureStage(index, stages):
     stagex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
