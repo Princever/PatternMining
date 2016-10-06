@@ -1,0 +1,105 @@
+#coding=utf-8
+__author__ = 'Prince'
+
+from dataPrepare import *
+from PrefixSpan import *
+import sys
+# import util as u
+from util import *
+from coarsePatternMining import *
+from splitPattern import *
+import time
+import copy
+
+if __name__ == "__main__":
+    ff = open('datas/time.txt','w')
+    database,allPlaces = dataPrepare()
+    
+
+    deltaT = 180
+    min_supp = 0.03
+    varthreshold = 2
+    bandwidth = 18
+    dampeningfactor = 0.3
+
+    count = 0
+    for each in database:
+        count += 1
+
+    time1 = time.time()
+    # maxLevel = 1
+    # control = [0, maxLevel-1]
+    # if maxLevel == 0:
+    scfi = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'PatternMining_frequentItem', pyFiles=['/home/zxu/Parallel_Version/PrefixSpan.py', '/home/zxu/Parallel_Version/util.py'])
+    patterns = prefixSpan(SquencePattern([], sys.maxint, []), database, deltaT, min_supp * count, scfi)
+    scfi.stop()
+    # else:
+        # patterns = prefixSpanD(SquencePattern([], sys.maxint, []), database, deltaT, min_supp * count, control)
+    # print_patterns(patterns)  ###
+    time2 = time.time()
+
+    prefixSpanTime = time2 - time1
+    print >> ff,'prefixSpanTime:',prefixSpanTime
+
+    time3 = time.time()
+
+    seqNums = []
+    for each in patterns:
+        seqNums.append(each.squence)
+    maxSeqs = maxSeq(seqNums)
+
+    allPatterns = []
+
+    for eachPattern in patterns:
+        if eachPattern.squence in maxSeqs:
+            allPatterns.append(eachPattern)
+
+
+
+    maxSeqsBackUp = maxSeqs[:]
+
+    time4 = time.time()
+    maxSeqTime = time4 - time3
+    print >> ff,'maxSeqTime:',maxSeqTime
+
+    # for each in maxSeqs:
+    #     print each
+
+    time5 = time.time()
+    coarsePatterns = generateSnippets(allPatterns, allPlaces)
+
+    time6 = time.time()
+    coarsePatternsTime = time6 - time5
+    print >> ff,'coarsePatternsTime:',coarsePatternsTime
+
+    time7 = time.time()
+
+    sc = SparkContext('spark://chris00.omni.hpcc.jp:7077', 'PatternMining_SplitPattern', pyFiles=['/home/zxu/Parallel_Version/splitPattern.py', '/home/zxu/Parallel_Version/util.py'])
+
+    fineGrainedPatterns = []
+    for eachPattern in coarsePatterns:
+        tmpResult = splitPattern(eachPattern['snippets'], min_supp * count, varthreshold, bandwidth, dampeningfactor, sc)
+        if tmpResult != []:
+            singlePattern = {'pattern':eachPattern['pattern'], 'snippets':tmpResult}
+            fineGrainedPatterns.append(singlePattern)
+    # for eachPattern in fineGrainedPatterns:   ###
+        # print 'A Pattern:',eachPattern    ###
+
+    sc.stop()
+
+    time8 = time.time()
+    fineGrainedPatternsTime = time8 - time7
+    print >> ff,'fineGrainedPatternsTime:',fineGrainedPatternsTime  
+
+    drawPatterns(fineGrainedPatterns)
+
+
+
+
+
+
+
+
+
+
+
